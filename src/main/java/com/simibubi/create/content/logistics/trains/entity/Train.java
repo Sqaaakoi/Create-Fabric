@@ -121,6 +121,7 @@ public class Train {
 	public boolean derailed;
 
 	public int fuelTicks;
+	public double partialFuelTicks;
 	public int honkTicks;
 
 	public Boolean lowHonk;
@@ -1025,10 +1026,22 @@ public class Train {
 
 	public void burnFuel() {
 		if (fuelTicks > 0) {
-			fuelTicks--;
+			double posSpeed = speed < 0 ? 0 - speed : speed;
+			if (posSpeed < (Math.max(AllConfigs.SERVER.trains.trainTopSpeed.getF(), AllConfigs.SERVER.trains.trainTurningTopSpeed.getF()) / 20))
+				posSpeed = 0;
+			float fuelTickRatio = AllConfigs.SERVER.trains.poweredTrainUseFuelRatio.get() ? (float)posSpeed * AllConfigs.SERVER.trains.poweredTrainFuelRatio.getF() : 1.0f;
+			fuelTickRatio += partialFuelTicks;
+			fuelTicks -= Math.floor(fuelTickRatio);
+			// System.out.println("speed " + posSpeed + " ft " + fuelTicks + " ftr " + fuelTickRatio);
+			fuelTickRatio -= Math.floor(fuelTickRatio);
+			partialFuelTicks = fuelTickRatio;
+			while (fuelTicks < 0) {
+				burnFuel();
+			}
 			return;
 		}
-
+		
+		partialFuelTicks = 0;
 		boolean iterateFromBack = speed < 0;
 		int carriageCount = carriages.size();
 
@@ -1087,6 +1100,7 @@ public class Train {
 		if (speedBeforeStall != null)
 			tag.putDouble("SpeedBeforeStall", speedBeforeStall);
 		tag.putInt("Fuel", fuelTicks);
+		tag.putDouble("FuelPart", partialFuelTicks);
 		tag.putDouble("TargetSpeed", targetSpeed);
 		tag.putString("IconType", icon.id.toString());
 		tag.putString("Name", Component.Serializer.toJson(name));
@@ -1147,6 +1161,7 @@ public class Train {
 		train.derailed = tag.getBoolean("Derailed");
 		train.updateSignalBlocks = tag.getBoolean("UpdateSignals");
 		train.fuelTicks = tag.getInt("Fuel");
+		train.partialFuelTicks = tag.getDouble("FuelPart");
 
 		NBTHelper.iterateCompoundList(tag.getList("SignalBlocks", Tag.TAG_COMPOUND), c -> train.occupiedSignalBlocks
 			.put(c.getUUID("Id"), c.contains("Boundary") ? c.getUUID("Boundary") : null));

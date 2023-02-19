@@ -17,6 +17,8 @@ public class CTrains extends ConfigBase {
 	public final ConfigFloat poweredTrainTopSpeed = f(40, 0, "poweredTrainTopSpeed", Comments.mps, Comments.poweredTrainTopSpeed);
 	public final ConfigFloat poweredTrainTurningTopSpeed = f(20, 0, "poweredTrainTurningTopSpeed", Comments.mps, Comments.poweredTrainTurningTopSpeed);
 	public final ConfigFloat poweredTrainAcceleration = f(3, 0, "poweredTrainAcceleration", Comments.acc, Comments.poweredTrainAcceleration);
+	public final ConfigBool poweredTrainUseFuelRatio = b(true, "poweredTrainUseFuelRatio", Comments.poweredTrainUseFuelRatio);
+	public final ConfigFloat poweredTrainFuelRatio = f(1, 0, "poweredTrainFuelRatio", Comments.ftr, Comments.poweredTrainFuelRatio);
 	
 
 	@Override
@@ -27,12 +29,15 @@ public class CTrains extends ConfigBase {
 	private static class Comments {
 		static String mps = "[in Blocks/Second]";
 		static String acc = "[in Blocks/Second²]";
+		static String ftr = "[in Fuel Ticks * Blocks/Tick]";
 		static String trainTopSpeed = "The top speed of any assembled Train.";
 		static String trainTurningTopSpeed = "The top speed of Trains during a turn.";
 		static String trainAcceleration = "The acceleration of any assembled Train.";
 		static String poweredTrainTopSpeed = "The top speed of powered Trains.";
 		static String poweredTrainTurningTopSpeed = "The top speed of powered Trains during a turn.";
 		static String poweredTrainAcceleration = "The acceleration of powered Trains.";
+		static String poweredTrainUseFuelRatio = "Whether the fuel/speed ratio is used or is a static 1 fuel used per tick.";
+		static String poweredTrainFuelRatio = "The amount of Fuel Ticks used per Blocks/Tick travelled.";
 		static String trainsCauseDamage = "Whether moving Trains can hurt colliding mobs and players.";
 		static String maxTrackPlacementLength = "Maximum length of track that can be placed as one batch or turn.";
 		static String maxAssemblyLength = "Maximum length of a Train Stations' assembly track.";
