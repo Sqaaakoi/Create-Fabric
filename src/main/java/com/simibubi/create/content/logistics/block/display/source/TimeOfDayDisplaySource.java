@@ -17,14 +17,17 @@ import net.fabricmc.api.Environment;
 public class TimeOfDayDisplaySource extends SingleLineDisplaySource {
 
 	public static final MutableComponent EMPTY_TIME = Components.literal("--:--");
+	public static final MutableComponent EMPTY_TIME_COMPACT = Components.literal("----");
 	@Override
 	protected MutableComponent provideLine(DisplayLinkContext context, DisplayTargetStats stats) {
+		boolean compact = stats.maxColumns() <= 4;
+		MutableComponent emptyTime = compact ? EMPTY_TIME_COMPACT : EMPTY_TIME;
 		if (!(context.level()instanceof ServerLevel sLevel))
-			return EMPTY_TIME;
+			return emptyTime;
 		if (!(context.getSourceTE() instanceof CuckooClockTileEntity ccte))
-			return EMPTY_TIME;
+			return emptyTime;
 		if (ccte.getSpeed() == 0)
-			return EMPTY_TIME;
+			return emptyTime;
 
 		boolean c12 = context.sourceConfig()
 			.getInt("Cycle") == 0;
@@ -49,7 +52,7 @@ public class TimeOfDayDisplaySource extends SingleLineDisplaySource {
 		}
 
 		MutableComponent component = Components.literal(
-			(hours < 10 ? " " : "") + hours + ":" + (minutes < 10 ? "0" : "") + minutes + (c12 ? " " : ""));
+			(hours < 10 ? (!c12 || compact ? "0" : " ") : "") + hours + (compact ? "" : ":") + (minutes < 10 ? "0" : "") + minutes + (c12 ? " " : ""));
 
 		return c12 ? component.append(suffix) : component;
 	}
@@ -76,6 +79,10 @@ public class TimeOfDayDisplaySource extends SingleLineDisplaySource {
 		if (isFirstLine)
 			return;
 
+		builder.addSelectionScrollInput(0, 60, (si, l) -> {
+			si.forOptions(Lang.translatedOptions("display_source.time", "12_hour", "24_hour"))
+				.titled(Lang.translateDirect("display_source.time.format"));
+		}, "Cycle");
 		builder.addSelectionScrollInput(0, 60, (si, l) -> {
 			si.forOptions(Lang.translatedOptions("display_source.time", "12_hour", "24_hour"))
 				.titled(Lang.translateDirect("display_source.time.format"));
