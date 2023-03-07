@@ -6,6 +6,7 @@ import java.util.Map;
 
 import com.google.common.base.Strings;
 import com.simibubi.create.Create;
+import com.simibubi.create.foundation.config.AllConfigs;
 import com.simibubi.create.foundation.utility.Lang;
 import com.simibubi.create.foundation.utility.NBTHelper;
 
@@ -69,7 +70,8 @@ public class FlapDisplaySection {
 		if (!singleFlap) {
 			if (rightAligned)
 				newText = newText.trim();
-			newText = newText.toUpperCase(Locale.ROOT);
+			if (AllConfigs.SERVER.kinetics.flapDisplayUpperCase.get())
+				newText = newText.toUpperCase(Locale.ROOT);
 			newText = newText.substring(0, Math.min(spinning.length, newText.length()));
 			String whitespace = Strings.repeat(" ", spinning.length - newText.length());
 			newText = rightAligned ? whitespace + newText : newText + whitespace;

@@ -21,6 +21,7 @@ public class CKinetics extends ConfigBase {
 	public final ConfigInt windmillSailsPerRPM = i(8, 1, "windmillSailsPerRPM", Comments.windmillSailsPerRPM);
 	public final ConfigInt maxEjectorDistance = i(32, 0, "maxEjectorDistance", Comments.maxEjectorDistance);
 	public final ConfigInt ejectorScanInterval = i(120, 10, "ejectorScanInterval", Comments.ejectorScanInterval);
+	public final ConfigBool flapDisplayUpperCase = b(true, "flapDisplayUpperCase", Comments.flapDisplayUpperCase);
 
 	public final ConfigGroup fan = group(1, "encasedFan", "Encased Fan");
 	public final ConfigInt fanPushDistance = i(20, 5, "fanPushDistance", Comments.fanPushDistance);
@@ -120,6 +121,7 @@ public class CKinetics extends ConfigBase {
 		static String amethystMovement = "Configure how Budding Amethyst can be moved by contraptions.";
 		static String obsidianMovement = "Configure how Obsidian blocks can be moved by contraptions.";
 		static String reinforcedDeepslateMovement = "Configure how Reinforced Deepslate blocks can be moved by contraptions.";
+		static String flapDisplayUpperCase = "Should Flap displays always be in UPPER CASE.";
 	}
 
 	public enum DeployerAggroSetting {
