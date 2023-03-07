@@ -91,32 +91,32 @@ public class CuckooClockTileEntity extends KineticTileEntity {
 			return;
 		}
 
-		if (canMakeNoise()) {
-			if (!level.isClientSide) {
-				if (animationType == Animation.NONE) {
-					if (hours == 12 && minutes < 5)
-						startAnimation(Animation.PIG);
-					if (hours == 18 && minutes < 36 && minutes > 31)
-						startAnimation(Animation.CREEPER);
-				} else {
-					float value = animationProgress.getValue();
-					animationProgress.setValue(value + 1);
-					if (value > 100)
-						animationType = Animation.NONE;
+		if (!level.isClientSide && canMakeNoise()) {
+			if (animationType == Animation.NONE) {
+				if (hours == 12 && minutes < 5)
+					startAnimation(Animation.PIG);
+				if (hours == 18 && minutes < 36 && minutes > 31)
+					startAnimation(Animation.CREEPER);
+			} else {
+				float value = animationProgress.getValue();
+				animationProgress.setValue(value + 1);
+				if (value > 100)
+					animationType = Animation.NONE;
 
-					if (animationType == Animation.SURPRISE && Mth.equal(animationProgress.getValue(), 50)) {
-						Vec3 center = VecHelper.getCenterOf(worldPosition);
-						level.destroyBlock(worldPosition, false);
-						level.explode(null, CUCKOO_SURPRISE, null, center.x, center.y, center.z, 3, false,
-							Explosion.BlockInteraction.BREAK);
-					}
-
+				if (animationType == Animation.SURPRISE && Mth.equal(animationProgress.getValue(), 50)) {
+					Vec3 center = VecHelper.getCenterOf(worldPosition);
+					level.destroyBlock(worldPosition, false);
+					level.explode(null, CUCKOO_SURPRISE, null, center.x, center.y, center.z, 3, false,
+						Explosion.BlockInteraction.BREAK);
 				}
+
 			}
+		}
 
-			if (level.isClientSide) {
-				moveHands(hours, minutes);
+		if (level.isClientSide) {
+			moveHands(hours, minutes);
 
+			if (canMakeNoise()) {
 				if (animationType == Animation.NONE) {
 					if (AnimationTickHolder.getTicks() % 32 == 0)
 						playSound(SoundEvents.NOTE_BLOCK_HAT, 1 / 16f, 2f);
