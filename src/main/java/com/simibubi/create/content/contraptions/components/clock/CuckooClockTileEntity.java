@@ -189,6 +189,8 @@ public class CuckooClockTileEntity extends KineticTileEntity {
 	}
 
 	private void playSound(SoundEvent sound, float volume, float pitch) {
+		if (!(getSpeed() < 4 && getSpeed () > -4))
+			return;
 		Vec3 vec = VecHelper.getCenterOf(worldPosition);
 		level.playLocalSound(vec.x, vec.y, vec.z, sound, SoundSource.BLOCKS, volume, pitch, false);
 	}
