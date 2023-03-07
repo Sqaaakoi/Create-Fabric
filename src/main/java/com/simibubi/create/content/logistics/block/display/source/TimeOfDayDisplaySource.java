@@ -30,7 +30,7 @@ public class TimeOfDayDisplaySource extends SingleLineDisplaySource {
 			return emptyTime;
 
 		boolean c12 = context.sourceConfig()
-			.getInt("Cycle") == 0;
+			.getInt("Cycle") < 2;
 		boolean isNatural = sLevel.dimensionType()
 			.natural();
 
@@ -39,7 +39,8 @@ public class TimeOfDayDisplaySource extends SingleLineDisplaySource {
 		int minutes = (dayTime % 1000) * 60 / 1000;
 		MutableComponent suffix = Lang.translateDirect("generic.daytime." + (hours > 11 ? "pm" : "am"));
 
-		minutes = minutes / 5 * 5;
+		if (context.sourceConfig().getInt("Cycle") % 2 == 0)
+			minutes = minutes / 5 * 5;
 		if (c12) {
 			hours %= 12;
 			if (hours == 0)
@@ -79,13 +80,9 @@ public class TimeOfDayDisplaySource extends SingleLineDisplaySource {
 		if (isFirstLine)
 			return;
 
-		builder.addSelectionScrollInput(0, 60, (si, l) -> {
-			si.forOptions(Lang.translatedOptions("display_source.time", "12_hour", "24_hour"))
-				.titled(Lang.translateDirect("display_source.time.format"));
-		}, "Cycle");
-		builder.addSelectionScrollInput(0, 60, (si, l) -> {
-			si.forOptions(Lang.translatedOptions("display_source.time", "12_hour", "24_hour"))
-				.titled(Lang.translateDirect("display_source.time.format"));
+		builder.addSelectionScrollInput(0, 130, (si, l) -> {
+			si.forOptions(Lang.translatedOptions("display_source.time", "12_hour", "12_hour_accurate",
+				"24_hour", "24_hour_accurate")).titled(Lang.translateDirect("display_source.time.format"));
 		}, "Cycle");
 	}
 
@@ -93,5 +90,10 @@ public class TimeOfDayDisplaySource extends SingleLineDisplaySource {
 	protected boolean allowsLabeling(DisplayLinkContext context) {
 		return true;
 	}
+
+	@Override
+	public int getPassiveRefreshTicks() {
+		return 10;
+	};
 
 }
