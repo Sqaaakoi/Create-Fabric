@@ -91,76 +91,78 @@ public class CuckooClockTileEntity extends KineticTileEntity {
 			return;
 		}
 
-		if (!level.isClientSide) {
-			if (animationType == Animation.NONE) {
-				if (hours == 12 && minutes < 5)
-					startAnimation(Animation.PIG);
-				if (hours == 18 && minutes < 36 && minutes > 31)
-					startAnimation(Animation.CREEPER);
-			} else {
-				float value = animationProgress.getValue();
-				animationProgress.setValue(value + 1);
-				if (value > 100)
-					animationType = Animation.NONE;
+		if (canMakeNoise()) {
+			if (!level.isClientSide) {
+				if (animationType == Animation.NONE) {
+					if (hours == 12 && minutes < 5)
+						startAnimation(Animation.PIG);
+					if (hours == 18 && minutes < 36 && minutes > 31)
+						startAnimation(Animation.CREEPER);
+				} else {
+					float value = animationProgress.getValue();
+					animationProgress.setValue(value + 1);
+					if (value > 100)
+						animationType = Animation.NONE;
 
-				if (animationType == Animation.SURPRISE && Mth.equal(animationProgress.getValue(), 50)) {
-					Vec3 center = VecHelper.getCenterOf(worldPosition);
-					level.destroyBlock(worldPosition, false);
-					level.explode(null, CUCKOO_SURPRISE, null, center.x, center.y, center.z, 3, false,
-						Explosion.BlockInteraction.BREAK);
-				}
-
-			}
-		}
-
-		if (level.isClientSide) {
-			moveHands(hours, minutes);
-
-			if (animationType == Animation.NONE) {
-				if (AnimationTickHolder.getTicks() % 32 == 0)
-					playSound(SoundEvents.NOTE_BLOCK_HAT, 1 / 16f, 2f);
-				else if (AnimationTickHolder.getTicks() % 16 == 0)
-					playSound(SoundEvents.NOTE_BLOCK_HAT, 1 / 16f, 1.5f);
-			} else {
-
-				boolean isSurprise = animationType == Animation.SURPRISE;
-				float value = animationProgress.getValue();
-				animationProgress.setValue(value + 1);
-				if (value > 100)
-					animationType = null;
-
-				// sounds
-
-				if (value == 1)
-					playSound(SoundEvents.NOTE_BLOCK_CHIME, 2, .5f);
-				if (value == 21)
-					playSound(SoundEvents.NOTE_BLOCK_CHIME, 2, 0.793701f);
-
-				if (value > 30 && isSurprise) {
-					Vec3 pos = VecHelper.offsetRandomly(VecHelper.getCenterOf(this.worldPosition), level.random, .5f);
-					level.addParticle(ParticleTypes.LARGE_SMOKE, pos.x, pos.y, pos.z, 0, 0, 0);
-				}
-				if (value == 40 && isSurprise)
-					playSound(SoundEvents.TNT_PRIMED, 1f, 1f);
-
-				int step = isSurprise ? 3 : 15;
-				for (int phase = 30; phase <= 60; phase += step) {
-					if (value == phase - step / 3)
-						playSound(SoundEvents.CHEST_OPEN, 1 / 16f, 2f);
-					if (value == phase) {
-						if (animationType == Animation.PIG)
-							playSound(SoundEvents.PIG_AMBIENT, 1 / 4f, 1f);
-						else
-							playSound(SoundEvents.CREEPER_HURT, 1 / 4f, 3f);
+					if (animationType == Animation.SURPRISE && Mth.equal(animationProgress.getValue(), 50)) {
+						Vec3 center = VecHelper.getCenterOf(worldPosition);
+						level.destroyBlock(worldPosition, false);
+						level.explode(null, CUCKOO_SURPRISE, null, center.x, center.y, center.z, 3, false,
+							Explosion.BlockInteraction.BREAK);
 					}
-					if (value == phase + step / 3)
-						playSound(SoundEvents.CHEST_CLOSE, 1 / 16f, 2f);
+
+				}
+			}
+
+			if (level.isClientSide) {
+				moveHands(hours, minutes);
+
+				if (animationType == Animation.NONE) {
+					if (AnimationTickHolder.getTicks() % 32 == 0)
+						playSound(SoundEvents.NOTE_BLOCK_HAT, 1 / 16f, 2f);
+					else if (AnimationTickHolder.getTicks() % 16 == 0)
+						playSound(SoundEvents.NOTE_BLOCK_HAT, 1 / 16f, 1.5f);
+				} else {
+
+					boolean isSurprise = animationType == Animation.SURPRISE;
+					float value = animationProgress.getValue();
+					animationProgress.setValue(value + 1);
+					if (value > 100)
+						animationType = null;
+
+					// sounds
+
+					if (value == 1)
+						playSound(SoundEvents.NOTE_BLOCK_CHIME, 2, .5f);
+					if (value == 21)
+						playSound(SoundEvents.NOTE_BLOCK_CHIME, 2, 0.793701f);
+
+					if (value > 30 && isSurprise) {
+						Vec3 pos = VecHelper.offsetRandomly(VecHelper.getCenterOf(this.worldPosition), level.random, .5f);
+						level.addParticle(ParticleTypes.LARGE_SMOKE, pos.x, pos.y, pos.z, 0, 0, 0);
+					}
+					if (value == 40 && isSurprise)
+						playSound(SoundEvents.TNT_PRIMED, 1f, 1f);
+
+					int step = isSurprise ? 3 : 15;
+					for (int phase = 30; phase <= 60; phase += step) {
+						if (value == phase - step / 3)
+							playSound(SoundEvents.CHEST_OPEN, 1 / 16f, 2f);
+						if (value == phase) {
+							if (animationType == Animation.PIG)
+								playSound(SoundEvents.PIG_AMBIENT, 1 / 4f, 1f);
+							else
+								playSound(SoundEvents.CREEPER_HURT, 1 / 4f, 3f);
+						}
+						if (value == phase + step / 3)
+							playSound(SoundEvents.CHEST_CLOSE, 1 / 16f, 2f);
+
+					}
 
 				}
 
+				return;
 			}
-
-			return;
 		}
 	}
 
@@ -188,8 +190,12 @@ public class CuckooClockTileEntity extends KineticTileEntity {
 		minuteHand.tickChaser();
 	}
 
+	private boolean canMakeNoise() {
+		return (getSpeed() < 4 && getSpeed () > -4);
+	}
+
 	private void playSound(SoundEvent sound, float volume, float pitch) {
-		if (!(getSpeed() < 4 && getSpeed () > -4))
+		if (!canMakeNoise())
 			return;
 		Vec3 vec = VecHelper.getCenterOf(worldPosition);
 		level.playLocalSound(vec.x, vec.y, vec.z, sound, SoundSource.BLOCKS, volume, pitch, false);
