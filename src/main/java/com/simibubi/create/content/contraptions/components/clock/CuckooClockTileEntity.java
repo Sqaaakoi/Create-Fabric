@@ -191,7 +191,7 @@ public class CuckooClockTileEntity extends KineticTileEntity {
 	}
 
 	private boolean canMakeNoise() {
-		return (getSpeed() < 4 && getSpeed () > -4);
+		return !(getSpeed() < 4 && getSpeed () > -4);
 	}
 
 	private void playSound(SoundEvent sound, float volume, float pitch) {
